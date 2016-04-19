@@ -43,6 +43,7 @@
 
 #pragma once
 #include "ofTypes.h"
+#include "pmUtils.h"
 
 class ofxObjCPointer {
 public:

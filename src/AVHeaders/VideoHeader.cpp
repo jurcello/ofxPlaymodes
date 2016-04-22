@@ -400,7 +400,7 @@ int VideoHeader::getLoopMode()
 //------------------------------------------------------
 void VideoHeader::setLoopMode(int loop)
 {
-	if((loopMode!=OF_LOOP_NORMAL) || (loopMode!=OF_LOOP_NONE) || (loopMode!=OF_LOOP_PALINDROME))
+    if(!((loop==OF_LOOP_NORMAL) || (loop==OF_LOOP_NONE) || (loop==OF_LOOP_PALINDROME)))
 	{
 		printf("ofxPlaymodes::VideoHeader:: Incorrect loop mode!\n");
 	}
@@ -461,7 +461,22 @@ void VideoHeader::setDriveMode(int mode)
 {
 	driveMode = mode;
 }
-	
+
+// Added functions.
+//------------------------------------------------------
+void VideoHeader::reset() {
+    speed       = 1;
+    in          = 1;
+    out         = 0;
+    playing   	= false;
+    delay       = 0;
+    opacity		= 255;
+    loopStart	= false;
+    loopMode	= OF_LOOP_NORMAL;
+    driveMode	= 0;
+    currentPos  = 0;
+}
+
 
 }
 

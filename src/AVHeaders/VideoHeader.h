@@ -58,6 +58,7 @@ public:
 	void	setPlaying(bool loopMode);
 	void	setPlaying(bool loopMode, float speed);
 	void	setLoopToStart();
+    void    reset();
 	
 	// 
 	int		getOpacity();

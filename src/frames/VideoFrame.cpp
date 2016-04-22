@@ -6,13 +6,12 @@
  */
 
 #include "VideoFrame.h"
-using Poco::ScopedLock;
 
 namespace ofxPm
 {
 int VideoFrame::total_num_frames=0;
 map<VideoFormat,vector<ofPtr<VideoFrame::Obj> > > VideoFrame::pool;
-ofMutex VideoFrame::poolMutex;
+std::mutex VideoFrame::poolMutex;
 
 class VideoFrame::Obj{
 public:
@@ -109,13 +108,15 @@ public:
 
 	VideoFrame VideoFrame::newVideoFrame(const ofPixels & videoFrame){
 		VideoFormat format(videoFrame);
-		poolMutex.lock();
+        poolMutex.lock();
 		if(!pool[format].empty()){
 			VideoFrame frame;
 			//cout << "returning frame from pool" << endl;
+            // A pool is a map in which the videoformat is the 'key'
+            // and the value is vector of data.
 			frame.data = pool[format].back();
 			pool[format].pop_back();
-			poolMutex.unlock();
+            poolMutex.unlock();
 
 			frame.refreshTimestamp();
 			frame.data->pixels = videoFrame;
@@ -123,20 +124,20 @@ public:
 			frame.data->createdTexPixels = true;
 			return frame;
 		}else{
-			poolMutex.unlock();
+            poolMutex.unlock();
 			return VideoFrame(videoFrame);
 		}
 	}
 
 	VideoFrame VideoFrame::newVideoFrame(ofTexture & videoFrame){
 		VideoFormat format(videoFrame);
-		poolMutex.lock();
+        poolMutex.lock();
 		if(!pool[format].empty()){
 			VideoFrame frame;
 			//cout << "returning frame from pool" << endl;
 			frame.data = pool[format].back();
 			pool[format].pop_back();
-			poolMutex.unlock();
+            poolMutex.unlock();
 
 			frame.refreshTimestamp();
 			frame.getFboRef();
@@ -145,20 +146,20 @@ public:
 			frame.data->createdTexPixels = false;
 			return frame;
 		}else{
-			poolMutex.unlock();
+            poolMutex.unlock();
 			return VideoFrame(videoFrame);
 		}
 	}
 
 	VideoFrame VideoFrame::newVideoFrame(ofFbo & videoFrame){
 		VideoFormat format(videoFrame);
-		poolMutex.lock();
+        poolMutex.lock();
 		if(!pool[format].empty()){
 			VideoFrame frame;
 			//cout << "returning frame from pool" << endl;
 			frame.data = pool[format].back();
 			pool[format].pop_back();
-			poolMutex.unlock();
+            poolMutex.unlock();
 
 			frame.refreshTimestamp();
 			frame.getFboRef();
@@ -167,7 +168,7 @@ public:
 			frame.data->createdTexPixels = false;
 			return frame;
 		}else{
-			poolMutex.unlock();
+            poolMutex.unlock();
 			return VideoFrame(videoFrame);
 		}
 	}
@@ -181,9 +182,13 @@ public:
 	}
 
 	void VideoFrame::poolDeleter(VideoFrame::Obj * obj){
-		poolMutex.lock();
-		pool[VideoFormat(obj->pixels)].push_back(ofPtr<Obj>(obj,&VideoFrame::poolDeleter));
-		poolMutex.unlock();
+        try {
+            std::unique_lock<std::mutex> lock(poolMutex);
+            pool[VideoFormat(obj->pixels)].push_back(ofPtr<Obj>(obj,&VideoFrame::poolDeleter));
+        }
+        catch(const std::exception& e) {
+            /* When program terminates, acquiring lock is impossible. */
+        }
 	}
 
 	ofPixels & VideoFrame::getPixelsRef(){
@@ -214,8 +219,8 @@ public:
 	}
 
 	int VideoFrame::getPoolSize(const VideoFormat & format){
-		ScopedLock<ofMutex> lock(poolMutex);
-		return pool[format].size();
+        std::unique_lock<std::mutex> lock(poolMutex);
+        return pool[format].size();
 	}
 
 

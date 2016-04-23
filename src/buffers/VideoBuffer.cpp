@@ -64,6 +64,12 @@ void VideoBuffer::newVideoFrame(VideoFrame & frame){
 
 }
 
+void VideoBuffer::replaceVideoFrame(VideoFrame &frame, int position) {
+    if (position > 0 && position < size()) {
+        frames[position] = frame;
+    }
+}
+
 Timestamp VideoBuffer::getLastTimestamp(){
     if(size()>0)
         return frames.back().getTimestamp();

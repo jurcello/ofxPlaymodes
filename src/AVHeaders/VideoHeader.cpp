@@ -154,12 +154,17 @@ int VideoHeader::getNextPosition(){
 		case 0 :
 			// normal mode, based on time
 			
+            // Check the duration of one frame.
 			if(playing) oneFrame=(TimeDiff)(1000000.0/fps/speed);
 			else oneFrame=(TimeDiff)(1000000.0/fps/1.0);
 			
+            // Size of the buffer.
 			buffer_size=buffer->size();
+            // Total number of frames since the start of the program.
 			totalNumFr = buffer->getTotalFrames();
-			lastAbsFrame = totalNumFr - buffer_size; 
+            // The last frame that is retrievable from the buffer.
+            lastAbsFrame = totalNumFr - buffer_size;
+            // The inFrame is the position of the frame in the buffer
 			inFrame  = int(double(buffer_size-1)*(in));
 			outFrame = int(double(buffer_size-1)*(out));
 			inAbsFrame  = totalNumFr -  inFrame;

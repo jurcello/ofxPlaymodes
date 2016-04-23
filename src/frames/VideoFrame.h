@@ -42,6 +42,8 @@ public:
 
 	void setTextureOnly(bool texOnly);
 
+    void updateTexture(ofTexture & texture);
+
 	static int getPoolSize(const VideoFormat & format);
 	static int getTotalNumFrames();
 

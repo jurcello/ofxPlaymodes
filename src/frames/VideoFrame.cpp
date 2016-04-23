@@ -236,4 +236,9 @@ public:
 		data->createdTexPixels=!texOnly;
 		data->pixelsChanged=false;
 	}
+
+    void VideoFrame::updateTexture(ofTexture & texture) {
+        this->data->updateTexture(texture);
+    }
+
 	}

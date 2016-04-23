@@ -49,6 +49,8 @@ public:
 
 	virtual void newVideoFrame(VideoFrame &frame);  // for notification of new frame event
 
+    void replaceVideoFrame(VideoFrame &frame, int position); // Replace a videoframe on a specified position
+
 	unsigned int size();                            // total size of the buffer
 	unsigned int getMaxSize();                         // max size of the buffer
 
